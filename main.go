@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"io"
 	"log"
 	"net/http"
-	"net/url"
+	"strconv"
 )
 
 const (
@@ -30,14 +33,20 @@ func main() {
 }
 
 func sendMessage(userId int, message string) {
-	body := url.Values{
-		"chat_id": {string(userId)},
-		"text":    {message},
+	values := map[string]string{
+		"chat_id": strconv.Itoa(userId),
+		"text":    message,
 	}
+	jsonValue, _ := json.Marshal(values)
 
-	resp, err := http.PostForm(ApiUrl+"/sendMessage", body)
+	resp, err := http.Post(ApiUrl+"/sendMessage", "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(resp.Body)
 }
