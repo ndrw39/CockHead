@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -21,15 +21,15 @@ func main() {
 	router.TrustedPlatform = "X-CDN-IP"
 
 	router.POST("/"+ApiToken, func(c *gin.Context) {
-		// If you set TrustedPlatform, ClientIP() will resolve the
-		// corresponding header and return IP directly
-		sendMessage(834117686, "Hello Dev")
+		var requestBody any
+		err := c.BindJSON(&requestBody)
+		errorHandler(err, false)
+		c.IndentedJSON(http.StatusOK, requestBody)
+		str := fmt.Sprintf("%v", requestBody)
+		sendMessage(834117686, str)
 	})
-
 	err := router.Run()
-	if err != nil {
-		return
-	}
+	errorHandler(err, true)
 }
 
 func sendMessage(userId int, message string) {
@@ -38,15 +38,19 @@ func sendMessage(userId int, message string) {
 		"text":    message,
 	}
 	jsonValue, _ := json.Marshal(values)
+	buffer := bytes.NewBuffer(jsonValue)
+	resp, err := http.Post(ApiUrl+"/sendMessage", "application/json", buffer)
 
-	resp, err := http.Post(ApiUrl+"/sendMessage", "application/json", bytes.NewBuffer(jsonValue))
+	errorHandler(err, false)
+	errorHandler(resp.Body.Close(), true)
+}
+
+func errorHandler(err any, fatal bool) {
 	if err != nil {
-		log.Fatalln(err)
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
+		if fatal == true {
+			log.Println(err)
+		} else {
 			log.Fatalln(err)
 		}
-	}(resp.Body)
+	}
 }
