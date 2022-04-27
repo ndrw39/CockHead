@@ -21,7 +21,7 @@ func main() {
 	router.TrustedPlatform = "X-CDN-IP"
 
 	router.POST("/"+ApiToken, func(c *gin.Context) {
-		var requestBody any
+		var requestBody error
 		err := c.BindJSON(&requestBody)
 		errorHandler(err, false)
 		c.IndentedJSON(http.StatusOK, requestBody)
@@ -45,7 +45,7 @@ func sendMessage(userId int, message string) {
 	errorHandler(resp.Body.Close(), true)
 }
 
-func errorHandler(err any, fatal bool) {
+func errorHandler(err error, fatal bool) {
 	if err != nil {
 		if fatal == true {
 			log.Println(err)
