@@ -20,7 +20,7 @@ func main() {
 	router.TrustedPlatform = "X-CDN-IP"
 
 	router.POST("/"+ApiToken, func(c *gin.Context) {
-		var requestBody map[string]any
+		var requestBody map[string]interface{}
 		err := c.BindJSON(&requestBody)
 		errorHandler(err, false)
 		sendMessage(834117686, requestBody["text"])
@@ -30,8 +30,8 @@ func main() {
 	errorHandler(err, true)
 }
 
-func sendMessage(userId int, message any) {
-	values := map[string]any{
+func sendMessage(userId int, message interface{}) {
+	values := map[string]interface{}{
 		"chat_id": strconv.Itoa(userId),
 		"text":    message,
 	}
