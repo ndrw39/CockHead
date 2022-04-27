@@ -15,13 +15,15 @@ const (
 	ApiUrl   string = "https://api.telegram.org/bot5342559232:AAEB9q73QHm9EaNVoZMa3lS2o0iwL2fg9Po"
 )
 
+type obj interface{}
+
 func main() {
 	router := gin.Default()
 	router.TrustedPlatform = gin.PlatformGoogleAppEngine
 	router.TrustedPlatform = "X-CDN-IP"
 
 	router.POST("/"+ApiToken, func(c *gin.Context) {
-		var requestBody error
+		var requestBody obj
 		err := c.BindJSON(&requestBody)
 		errorHandler(err, false)
 		c.IndentedJSON(http.StatusOK, requestBody)
