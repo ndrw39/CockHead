@@ -23,7 +23,7 @@ func main() {
 		var requestBody map[string]interface{}
 		err := c.BindJSON(&requestBody)
 		errorHandler(err, false)
-		sendMessage(834117686, requestBody["text"])
+		sendMessage(834117686, requestBody)
 	})
 
 	err := router.Run()
