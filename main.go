@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -25,8 +24,8 @@ func main() {
 		err := c.BindJSON(&requestBody)
 		errorHandler(err, false)
 		c.IndentedJSON(http.StatusOK, requestBody)
-		str := fmt.Sprintf("%v", requestBody)
-		sendMessage(834117686, str)
+		//str := fmt.Sprintf("%v", requestBody)
+		sendMessage(834117686, "TEST")
 	})
 	err := router.Run()
 	errorHandler(err, true)
