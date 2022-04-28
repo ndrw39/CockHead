@@ -1,17 +1,10 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"cockHead/common"
+	"cockHead/conf"
+	"cockHead/telegram"
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
-	"strconv"
-)
-
-const (
-	ApiToken string = "5342559232:AAEB9q73QHm9EaNVoZMa3lS2o0iwL2fg9Po"
-	ApiUrl   string = "https://api.telegram.org/bot5342559232:AAEB9q73QHm9EaNVoZMa3lS2o0iwL2fg9Po"
 )
 
 func main() {
@@ -19,36 +12,19 @@ func main() {
 	router.TrustedPlatform = gin.PlatformGoogleAppEngine
 	router.TrustedPlatform = "X-CDN-IP"
 
-	router.POST("/"+ApiToken, func(c *gin.Context) {
-		var requestBody map[string]interface{}
-		err := c.BindJSON(&requestBody)
-		errorHandler(err, false)
-		sendMessage(834117686, requestBody)
+	router.POST("/"+conf.ApiToken, func(c *gin.Context) {
+		var request telegram.Request
+		err := c.BindJSON(&request)
+		if common.ErrorHandler(err, false) != false {
+			return
+		}
+
+		switch request.Message.Text {
+		case "/start":
+			telegram.Start(request.Message.Chat.ID)
+		}
 	})
 
 	err := router.Run()
-	errorHandler(err, true)
-}
-
-func sendMessage(userId int, message interface{}) {
-	values := map[string]interface{}{
-		"chat_id": strconv.Itoa(userId),
-		"text":    message,
-	}
-	jsonValue, _ := json.Marshal(values)
-	buffer := bytes.NewBuffer(jsonValue)
-	resp, err := http.Post(ApiUrl+"/sendMessage", "application/json", buffer)
-
-	errorHandler(err, false)
-	errorHandler(resp.Body.Close(), true)
-}
-
-func errorHandler(err error, fatal bool) {
-	if err != nil {
-		if fatal == true {
-			log.Println(err)
-		} else {
-			log.Fatalln(err)
-		}
-	}
+	common.ErrorHandler(err, true)
 }
