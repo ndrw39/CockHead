@@ -52,7 +52,7 @@ func SendPhoto(userId int, path string) {
 	if common.ErrorHandler(err, false) != false {
 		return
 	}
-	_, err = io.Copy(fw, strings.NewReader(string(rune(userId))))
+	_, err = io.Copy(fw, strings.NewReader(strconv.Itoa(userId)))
 	if common.ErrorHandler(err, false) != false {
 		return
 	}
